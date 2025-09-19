@@ -132,12 +132,15 @@ operation Search [140B] {
 На 1 пользователя:
 - Write = 1x(create_post) + 50x(like) + 30x(comment) + 1x(subscribe) = 400Kb + 50*40B + 30*120B + 32B = ~405 Kb/s
 
-- Read = fetch_posts + 10*(get_comments + get_image) + 5x(search) = 1.6Kb + 10*(832B + 400Kb) + 5*140B = ~4 Mb/s
-> Получить пост, на каждый пост получаем 10 комментариев и по изображению + 5 поисков
+- Read:
+  1. Чтение ленты: fetch_posts + 10*(get_comments + get_image) = 1.6Kb + 10*(832B + 400Kb) = ~4 Mb/s
+  2. Поиск: 5x(search) = 5*(140B + Чтение ленты поиска) = ~20 Mb/s
 
 На 10.000.000 пользователей:
 - Write = DAU * 405Kb = 4050 Gb/s
-- Read = DAU * 4Mb = 40 Tb/s
+- Read:
+  1. Чтение ленты = DAU * 4Mb = 40 Tb/s
+  2. Поиск: 200 Tb/s
 
 ### Расчет одновременных соединений
 
