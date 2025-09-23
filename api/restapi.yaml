@@ -1,0 +1,680 @@
+openapi: 3.0.4
+info:
+  title: Traveler Social Network API
+  description: |-
+    ## Обзорный REST API для проектируемой социальной сети для путешественников
+    
+    ### [Репозиторий проекта](https://github.com/zkryaev/social_network_system_design)
+  version: 0.0.1
+tags:
+  - name: posts
+    description: Управление постами пользователей
+  - name: subscriptions
+    description: Управление подписками
+  - name: likes
+    description: Лайки
+  - name: comments
+    description: Комментарии
+  - name: search
+    description: Поиск постов и пользователей
+  - name: travelers
+    description: Профиль и лента путешественников
+  - name: media
+    description: Получение и загрузка медиа
+
+paths:
+  /posts:
+    post:
+      tags:
+        - posts
+      summary: Создать новый пост
+      operationId: createPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasePost'
+      responses:
+        '200':
+          description: Пост создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPost'
+        '400':
+          description: Неверные данные
+        '500':
+          description: Ошибка сервера
+
+    get:
+      tags:
+        - posts
+      summary: Получить список постов
+      operationId: listPosts
+      parameters:
+        - name: geo_tag
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: author_id
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+      responses:
+        '200':
+          description: Пост создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPost'
+        '500':
+          description: Ошибка сервера
+
+    put:
+      tags:
+        - posts
+      summary: Обновить существующий пост
+      operationId: updatePost
+      requestBody:
+        description: Обновлённые данные поста
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasePost'
+      responses:
+        '200':
+          description: Пост обновлён
+        '400':
+          description: Неверный ID поста
+        '500':
+          description: Ошибка сервера
+    
+    delete:
+      tags:
+        - posts
+      summary: Удалить существующий пост
+      operationId: deletePost
+      parameters:
+        - name: post_id
+          in: query
+          required: true
+          schema:
+            type : integer
+      responses:
+        '200':
+          description: Пост удален
+        '400':
+          description: Неверный ID поста
+        '404':
+          description: Пост не найден
+        '500':
+          description: Ошибка сервера
+
+  /travelers:
+    get:
+      tags:
+        - travelers
+      summary: Получить профиль путешественника
+      operationId: getProfile
+      parameters:
+        - name: traveler_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Подписан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveler'
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Ошибка сервера
+
+  /posts/likes:
+    post:
+      tags:
+        - likes
+      summary: Поставить лайк
+      operationId: postLike
+      parameters:
+        - name: post_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '404':
+          description: Пост не найден
+        '500':
+          description: ''
+          
+    delete:
+      tags:
+        - likes
+      summary: Удалить лайк
+      operationId: deleteLike
+      parameters:
+        - name: post_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '404':
+          description: Пост не найден
+        '500':
+          description: ''
+
+  /posts/comments:
+    post:
+      tags:
+        - comments
+      summary: Написать комментарий
+      operationId: postComment
+      requestBody:
+        description: Комментарий
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: ''
+        '404':
+          description: Пост не найден
+        '500':
+          description: ''
+          
+    get:
+      tags:
+        - comments
+      summary: Получить комментарии
+      operationId: getComments
+      parameters:
+        - name: post_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+      responses:
+        '200':
+          description: Список комментариев успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          description: ''
+        '404':
+          description: Пост не найден
+        '500':
+          description: ''
+
+    put:
+      tags:
+        - comments
+      summary: Редактировать комментарий
+      operationId: putComment
+      requestBody:
+        description: Комментарий
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
+
+  /search:
+    get:
+      tags:
+        - search
+      summary: Получить посты с тэгом местоположения
+      operationId: getSearchPosts
+      parameters:
+        - name: title
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: get_tag
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+      responses:
+        '200':
+          description: Список популярных мест
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetPost'
+        '400':
+          description: ''
+        '404':
+          description: Пост не найден
+        '500':
+          description: ''
+          
+  /travelers/subscriptions:
+    post:
+      tags:
+        - subscriptions
+      summary: Подписаться
+      operationId: postSubscribe
+      requestBody:
+        description: Подписка
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseSubscription'
+      responses:
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: ''
+          
+    get:
+      tags:
+        - subscriptions
+      summary: Получить список подписок или подписчиков
+      operationId: getSubscribes
+      parameters:
+        - name: traveler_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: is_subs
+          in: query
+          required: true
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Подписан
+          content:
+            application/json:
+              schema:
+                description: Список ID подписок/подписчиков
+                type: array
+                items:
+                  properties:
+                    subscriptionId:
+                      type: integer
+                      format: int64
+                      example: 123
+        '400':
+          description: ''
+        '500':
+          description: Ошибка сервера
+
+    delete:
+      tags:
+        - subscriptions
+      summary: Отписаться
+      operationId: deleteSubscribes
+      parameters:
+        - name: subscribe_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+        '400':
+          description: ''
+        '500':
+          description: Ошибка сервера
+          
+  /media:
+    post:
+      tags:
+        - media
+      summary: Загрузить изображение
+      operationId: postMedia
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  format: int64
+                  description: Идентификатор пользователя для загрузки аватарки
+                post_id:
+                  type: integer
+                  format: int64
+                  description: Идентификатор поста
+                image:
+                  type: string
+                  format: binary
+                  description: Файл изображения (JPEG, PNG, GIF)
+              required:
+                - image
+        required: true
+      responses:
+        '200':
+          description: Изображение успешно загружено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: "https://cdn.example.com/images/a1b2c3d4.jpg"
+                  thumbnailUrl:
+                    type: string
+                    format: uri
+                    example: "https://cdn.example.com/thumbs/a1b2c3d4.jpg"
+        '400':
+          description: Неверный формат файла или отсутствует файл
+        '422':
+          description: Файл слишком большой или повреждён
+        '500':
+          description: Ошибка сервера
+
+    get:
+      tags:
+        - media
+      summary: Получить список постов
+      operationId: getMedia
+      parameters:
+        - name: image_url
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "https://cdn.example.com/thumbs/a1b2c3d4.jpg"
+      responses:
+        '200':
+          description: Изображение успешно получено
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  image:
+                    type: string
+                    format: binary
+                    description: Файл изображения (JPEG, PNG, GIF)
+        '500':
+          description: Ошибка сервера
+
+    put:
+      tags:
+        - media
+      summary: Обновить существующий пост
+      operationId: putMedia
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  format: int64
+                  description: Идентификатор пользователя для загрузки аватарки
+                post_id:
+                  type: integer
+                  format: int64
+                  description: Идентификатор поста
+                image:
+                  type: string
+                  format: binary
+                  description: Файл изображения (JPEG, PNG, GIF)
+              required:
+                - image
+      responses:
+        '200':
+          description: Изображение успешно загружено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: "https://cdn.example.com/images/a1b2c3d4.jpg"
+                  thumbnailUrl:
+                    type: string
+                    format: uri
+                    example: "https://cdn.example.com/thumbs/a1b2c3d4.jpg"
+        '400':
+          description: Неверный формат файла или отсутствует файл
+        '422':
+          description: Файл слишком большой или повреждён
+        '500':
+          description: Ошибка сервера
+    
+    delete:
+      tags:
+        - media
+      summary: Удалить существующий пост
+      operationId: deleteMedia
+      parameters:
+        - name: image_url
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "https://cdn.example.com/thumbs/a1b2c3d4.jpg"
+      responses:
+        '200':
+          description: Пост удален
+        '400':
+          description: Неверный ID поста
+        '404':
+          description: Пост не найден
+        '500':
+          description: Ошибка сервера
+
+components:
+  schemas:
+    Comment:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          format: int64
+          example: 1
+        user_id:
+          type: integer
+          format: int64
+          example: 2
+        post_id:
+          type: integer
+          format: int64
+          example: 3
+        text:
+          type: string
+          example: 'Классный кадр!'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-05T12:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-05T12:00:00Z"
+      required:
+        - user_id
+        - post_id
+  
+    BaseSubscription:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          example: 10
+        target_id:
+          type: integer
+          format: int64
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-05T12:00:00Z"
+      required:
+        - user_id
+        - target_id
+    
+    Traveler:
+      type: object
+      properties:
+        traveler_id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: travel_guru
+        firstName:
+          type: string
+          example: Алексей
+        lastName:
+          type: string
+          example: Иванов
+        email:
+          type: string
+          example: alex@example.com
+        bio:
+          type: string
+          example: Люблю горы и море 🌄🌊
+        avatarUrl:
+          type: string
+          example: https://example.com/avatars/alex.jpg
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-05T12:00:00Z"
+      required:
+        - username
+        - email
+
+    BasePost:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 101
+        authorId:
+          type: integer
+          format: int64
+          example: 10
+        title:
+          type: string
+          example: "Мой поход на Байкал!"
+        location:
+          type: string
+          example: "Россия, Байкал"
+        likesCount:
+          type: integer
+          example: 42
+        commentsCount:
+          type: integer
+          example: 8
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-05T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-05T10:30:00Z"
+      required:
+        - title
+        - authorId
+        
+    GetPost:
+      allOf:
+        - $ref: '#/components/schemas/BasePost'
+        - type: object
+          properties:
+            images_url:
+              type: array
+              description: Список изображений поста
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: "https://cdn.example.com/images/7a3f9b1c.jpg"
+                  thumbnailUrl:
+                    type: string
+                    format: uri
+                    example: "https://cdn.example.com/thumbs/7a3f9b1c.jpg"
+              minItems: 0
