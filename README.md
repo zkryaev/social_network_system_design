@@ -76,13 +76,18 @@ DAY = 86400
 Поскольку в СНГ превалирующее число языков занимает 2 байта в utf-8, поэтому считаю так: число символов * 2 байта
 
 ```
-CreatePost [~15Mb] {
+CreatePost [~2Kb] {
     id (8)
     user_id (8) 
     text ~ 2Kb (1000 * 2B)
-    image[5] ~ 15Mb (5 * 3Mb)
     geo_tag_id (8) // например [Россия, Байкал] = 20141251
     created_at (8)
+}
+
+UploadImage [~3Mb] {
+  post_id
+  user_id
+  image ~ 3 Mb
 }
 
 Like [40B] {
@@ -111,7 +116,9 @@ Subcribe [32B] {
 ```
 **Результаты трафика Запись:**
 
-`Posts = 52 * 15Mb = 780 Mb/s`
+`Posts = 52 * 2Kb = 104 Kb/s`
+
+`Image = 52 * (5 изображений на пост) * 3Mb = 780 Mb/s`
 
 `Comments = 520 * 1Kb = 520 Kb/s`
 
@@ -123,11 +130,11 @@ Subcribe [32B] {
 
 ```
 // Посты получаем пачками до 10 штук
-FetchPosts [402Kb*10 = 4020Kb ~4Mb] {
+FetchPosts [2Kb*10 = 20Kb] {
     id
     user_id
     posts: [
-        post [~402Kb]: {
+        post [~2Kb]: {
             post_id
             author_id
             likes_amount
@@ -135,7 +142,7 @@ FetchPosts [402Kb*10 = 4020Kb ~4Mb] {
             created_at
             text ~ 2Kb
             image_url ~ 30B // -> GetImage, если пользователь тыкнет по изображению отдаем уже фулл качество
-            image_preview ~ 400Kb // кропнутая версия изображения
+            image_preview_url ~ 30B // кропнутая версия изображения
         }
         еще 9...
     ]
@@ -154,15 +161,15 @@ GetComments [10Kb] {
     total
 }
 
-GetProfile [~4,5Mb] {
+GetProfile [~20,7Kb] {
   id
   user_id
   profile_id
   name ~ 50B
   last_name ~ 50B
-  profile_img ~ 300Kb
+  profile_img_url ~ 30B
   description ~ 500B
-  posts: FetchPosts [4Mb]
+  posts: FetchPosts [20Kb]
 }
 
 // Есть список тегов, пользователь вводит условно Байкал и ему выпадает этот тег,
@@ -178,24 +185,23 @@ Search [240B] {
 }
 
 GetImage [~3Mb] {
-    image_url ~ 30B
     image ~ 3Mb
 }
 ```
 **Результаты трафика Чтение:**
 
-`GetPosts = 3472 * 4Mb ~ 14 Gb/s`
+`Posts = 3472 * 20Kb ~ 69 Mb/s`
 
-`GetComments = 1157 * 10Kb ~ 12Mb/s`
+`Images = 3472 * (5 изображений на пост) * 3Mb ~ 52 Gb/s`
 
-`GetProfile = 579 * 4.5Mb ~ 2,6 Gb/s`
+`Comments = 1157 * 10Kb ~ 12Mb/s`
+
+`Profile = 579 * 4.5Mb ~ 12 Mb/s`
 
 `Search = 579 * 240B = 139 Kb/s`
 
-- Если отдельно считать еще трафик по изображениям на каждый пост с 5 фото:
-
-`GetImages = 3472 * 5 * 3Mb = 52 Gb/s`
-
 ### Расчет одновременных соединений
 
-- Connections = 10 000 000 \* 0.1 = 1 000 000
+- Connections = 10 000 000 \* 0.1 = 1 000 000 (Обычно)
+
+- Connections = 10 000 000 \* 0.2 = 2 000 000 (В сезоны отпусков)
