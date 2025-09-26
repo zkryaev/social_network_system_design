@@ -122,6 +122,27 @@ paths:
           description: Ошибка сервера
 
   /travelers:
+    post:
+      tags:
+        - travelers
+      summary: Создать профиль путешественника
+      operationId: postProfile
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveler'
+      responses:
+        '200':
+          description: Создан профиль
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveler'
+        '400':
+          description: ''
+        '500':
+          description: Ошибка сервера
     get:
       tags:
         - travelers
@@ -135,13 +156,46 @@ paths:
             type: integer
       responses:
         '200':
-          description: Подписан
+          description: Получен профиль
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Traveler'
         '404':
           description: Пользователь не найден
+        '500':
+          description: Ошибка сервера
+    put:
+      tags:
+        - travelers
+      summary: Внести изменения в профиль путешественника
+      operationId: putProfile
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveler'
+      responses:
+        '200':
+          description: Данные профиля изменены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveler'
+        '400':
+          description: ''
+        '500':
+          description: Ошибка сервера
+    delete:
+      tags:
+        - travelers
+      summary: Удалить профиль путешественника
+      operationId: deleteProfile
+      responses:
+        '200':
+          description: Профиль удален
+        '400':
+          description: ''
         '500':
           description: Ошибка сервера
 
