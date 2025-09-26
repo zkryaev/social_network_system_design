@@ -626,10 +626,6 @@ components:
     BasePost:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 101
         authorId:
           type: integer
           format: int64
@@ -663,6 +659,10 @@ components:
         - $ref: '#/components/schemas/BasePost'
         - type: object
           properties:
+            id:
+              type: integer
+              format: int64
+              example: 101
             images_url:
               type: array
               description: Список изображений поста
