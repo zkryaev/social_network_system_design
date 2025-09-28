@@ -150,6 +150,12 @@ FetchPosts [2Kb*10 = 20Kb] {
     total
 }
 
+GetLikes [24B] {
+    id
+    post_id
+    total
+}
+
 GetComments [10Kb] {
     id
     post_id
@@ -195,6 +201,8 @@ GetImage [~3Mb] {
 `Images = 3472 * (5 изображений на пост) * 3Mb ~ 52 Gb/s`
 
 `Comments = 1157 * 10Kb ~ 12Mb/s`
+
+`Likes = 1157 * 24B ~ 28Kb/s`
 
 `Profile = 579 * 4.5Mb ~ 12 Mb/s`
 
