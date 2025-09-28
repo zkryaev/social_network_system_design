@@ -1,3 +1,6 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
 Table follows {
   following_user_id integer
   followed_user_id integer
@@ -52,13 +55,21 @@ Table media_posts {
   created_at timestamp
 }
 
+Table likes {
+  id integer [primary key]
+  post_id integer
+  total integer
+}
+
 Ref posts_media: media_posts.post_id > posts.id
 
-Ref users_media: users.id - media_avatars.user_id 
+Ref users_media: users.id - media_avatars.user_id
 
 Ref posts_geo: geo.id - posts.geo_tag_id 
 
 Ref posts_comments: comments.post_id > posts.id
+
+Ref posts_likes: likes.post_id > posts.id
 
 Ref users_comments: comments.user_id > users.id
 
