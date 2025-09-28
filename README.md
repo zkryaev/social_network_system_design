@@ -62,7 +62,8 @@ DAY = 86400
 - RPS(write) = DAU * 15 / DAY = 1736 
 
 #### Подписка
-- RPS = DAU * 0.2 / DAY = 23
+- RPS(write) = DAU * 0.2 / DAY = 23
+- RPS(read) = DAU * 5 / DAY = 579 // пусть в среднем столько же, сколько просмотров профилей
 
 #### Просмотр страниц путешественников
 - RPS = DAU * 5 / DAY = 579
@@ -178,6 +179,13 @@ GetProfile [~20,7Kb] {
   posts: FetchPosts [20Kb]
 }
 
+GetSubcribes [104B] {
+    user_id 
+    targets [10]target_id ~ 10*8 = 80B
+    page
+    total
+}
+
 // Есть список тегов, пользователь вводит условно Байкал и ему выпадает этот тег,
 // он его выбирает и получает посты связанные с этим тегом
 
@@ -205,6 +213,8 @@ GetImage [~3Mb] {
 `Likes = 1157 * 24B ~ 28Kb/s`
 
 `Profile = 579 * 4.5Mb ~ 12 Mb/s`
+
+`Subscribes = 579 * 104B ~ 60Kb/s`
 
 `Search = 579 * 240B = 139 Kb/s`
 
