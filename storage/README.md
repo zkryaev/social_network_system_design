@@ -4,7 +4,7 @@
 
 ### Прогноз количества дисков для хранения и обработки представленных данных на 1 год:
 
-- [Расчеты RPS/Трафика](https://github.com/zkryaev/social_network_system_design/tree/develop)
+- [Расчеты RPS/Трафика]([https://github.com/zkryaev/social_network_system_design/tree/develop](https://github.com/zkryaev/social_network_system_design/tree/develop#:~:text=%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F/%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%BA%D0%B8%3A%201%D1%81-,%D0%9E%D1%86%D0%B5%D0%BD%D0%BA%D0%B0%20%D0%BD%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8,-%D0%A0%D0%B0%D1%81%D1%87%D0%B5%D1%82%20RPS))
 
 #### Расчет характеристик по доменам
 | Домен         | Объем хранимого    | Throughput | IOPS    |
