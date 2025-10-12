@@ -1,0 +1,80 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table follows {
+  following_user_id integer
+  followed_user_id integer
+  created_at timestamp
+}
+
+Table users {
+  id integer [primary key]
+  username varchar
+  firstname varchar
+  lastname varchar
+  email varchar
+  bio varchar
+  created_at timestamp
+}
+
+Table posts {
+  id integer [primary key]
+  title varchar
+  user_id integer [not null]
+  geo_tag_id integer
+  likes_cnt integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table geo {
+  id integer [primary key]
+  location varchar [note: "Россия, Байкал"]
+}
+
+Table comments {
+  id integer [primary key]
+  user_id integer
+  post_id integer
+  text varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table media_avatars {
+  id integer [primary key]
+  user_id integer
+  image_url varchar
+  created_at timestamp
+}
+
+Table media_posts {
+  id integer [primary key]
+  post_id integer
+  image_url varchar
+  created_at timestamp
+}
+
+Table likes {
+  id integer [primary key]
+  post_id integer
+  total integer
+}
+
+Ref posts_media: media_posts.post_id > posts.id
+
+Ref users_media: users.id - media_avatars.user_id
+
+Ref posts_geo: geo.id - posts.geo_tag_id 
+
+Ref posts_comments: comments.post_id > posts.id
+
+Ref posts_likes: likes.post_id > posts.id
+
+Ref users_comments: comments.user_id > users.id
+
+Ref user_posts: posts.user_id > users.id
+
+Ref: users.id < follows.following_user_id
+
+Ref: users.id < follows.followed_user_id
