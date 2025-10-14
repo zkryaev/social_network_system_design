@@ -1,0 +1,38 @@
+@startuml Post_container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+
+Person(client, "Client", "Site/Mobile")
+Container(loadBalancer, "Load Balancer", "Nginx", "Uses round robin", $sprite="nginx")
+Container(media, "S3 Storage", "Ceph/Minio", "Store images by image_url")
+Container(userService, "User Service", "Go", "Store and handle users")
+Container(geoService, "Geo Service", "Go", "Store and handle geo marks")
+Container(reactions, "Reactions Service", "Go", "Store and handle comments and likes")
+ContainerQueue(messageQueue, "Events queue", "Kafka", "Message queue for events by post updates")
+
+Container_Boundary(postServiceGroup, "Post Service") {
+    Container(postService, "Post Service", "Go", "Handle posts", $tags="webApp")
+    ContainerDb(postDB, "Post database", "PgSQL", "Stores posts and metainfo", $tags="db", $sprite="postgresql")
+    ContainerDb(postCache, "Post cache", "Redis", "Stores popular posts", $tags="db", $sprite="redis")
+    Container(cdc, "CDC", "Daemon", "Notify about created post and image_url linked to it")
+}
+
+Rel(postService, postDB, "Read/write posts")
+Rel(postService, postCache, "Cache popular posts")
+Rel(postService, cdc, "Changes")
+
+Rel(client, loadBalancer, "Request", "REST")
+Rel(loadBalancer, postService, "CRUD post, search", "REST")
+Rel(loadBalancer, userService, "CRUD users, subscribes", "REST")
+Rel(loadBalancer, reactions, "CRUD likes/comments", "REST")
+Rel(loadBalancer, media, "CRUD media", "REST")
+
+Rel(postService, geoService, "Get geo info")
+Rel(userService, geoService, "Get geo info")
+Rel(postService, messageQueue, "Publishes events for adding/removing a post")
+Rel(reactions, messageQueue, "Subscribes on events for adding/removing a post")
+Rel(cdc, media, "")
+@enduml

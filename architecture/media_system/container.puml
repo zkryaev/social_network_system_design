@@ -1,0 +1,34 @@
+@startuml Media_container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+
+!include DEVICONS/nginx.puml
+!include DEVICONS/postgresql.puml
+
+Person(client, "Client", "Site/Mobile")
+Container(loadBalancer, "Load Balancer", "Nginx", "Uses round robin", $sprite="nginx")
+Container(geoService, "Geo Service", "Go", "Store and handle geo marks")
+Container(userService, "User Service", "Go", "Store and handle users")
+Container(reactions, "Reactions Service", "Go", "Store and handle comments and likes")
+Container(postService, "Post Service", "Go", "Store and handle posts")
+ContainerQueue(messageQueue, "Events queue", "Kafka", "Message queue for events by post updates")
+
+Container_Boundary(mediaServiceGroup, "Media Service") {
+    Container(mediaStorage, "Media Storage", "S3 Like Storage", "Store and handle media", $sprite="s3")
+    ContainerDb(mediaDb, "Media database", "PgSQL", "Stores image_urls: tmp, approved", $tags="db", $sprite="postgresql")
+}
+
+Rel(mediaStorage, mediaDb, "Read/write image_urls")
+
+Rel(client, loadBalancer, "Request", "REST")
+Rel(loadBalancer, postService, "CRUD post, search", "REST")
+Rel(loadBalancer, userService, "CRUD users, subscribes", "REST")
+Rel(loadBalancer, reactions, "CRUD likes/comments", "REST")
+Rel(loadBalancer, mediaStorage, "CRUD media", "REST")
+
+Rel(postService, geoService, "Get geo info")
+Rel(userService, geoService, "Get geo info")
+Rel(postService, messageQueue, "Publishes events for adding/removing a post")
+Rel(reactions, messageQueue, "Subscribes on events for adding/removing a post")
+Rel(postService, mediaStorage, "Notify about changes")
+@enduml
