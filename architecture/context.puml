@@ -16,5 +16,6 @@ Rel(postService, geoService, "Get geo data")
 Rel(userService, geoService, "Get geo data")
 Rel(postService, reactions, "Send updates about posts")
 Rel(postService, media, "Send updates about post's images")
+Rel(postService, userService, "Get user's relations")
 
 @enduml

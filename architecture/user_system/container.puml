@@ -1,36 +1,36 @@
-@startuml User_container
+@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 !define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
-
 !include DEVICONS/postgresql.puml
 !include DEVICONS/redis.puml
 
 Person(client, "Client", "Site/Mobile")
-Container(loadBalancer, "Load Balancer", "Nginx", "Uses round robin", $sprite="nginx")
-Container(media, "S3 Storage", "Ceph/Minio", "Store images by image_url")
-Container(geoService, "Geo Service", "Go", "Store and handle geo marks")
-Container(reactions, "Reactions Service", "Go", "Store and handle comments and likes")
-Container(postService, "Post Service", "Go", "Store and handle posts")
-ContainerQueue(messageQueue, "Events queue", "Kafka", "Message queue for events by post updates")
+Container_Ext(loadBalancer, "Load Balancer", "Nginx", "Routes incoming requests")
+System_Ext(geoSystem, "Geo System", "Provides geo tags")
+System_Ext(mediaSystem, "Media System", "Stores images")
+ContainerQueue_Ext(postEventsQueue, "Post Events", "Kafka", "Post lifecycle events")
+ContainerQueue_Ext(userRelationsQueue, "User Relations Events", "Kafka", "Follow/unfollow events")
 
-Container_Boundary(userServiceGroup, "User Service") {
-    Container(userService, "User Service", "Go", "Store and handle users", $tags="webApp")
-    ContainerDb(userDb, "User database", "PgSQL", "Stores users, subscribes", $tags="db", $sprite="postgresql")
-    ContainerDb(userCache, "User cache", "Redis", "Stores popular users", $tags="db", $sprite="redis")
+System_Boundary(postServiceGroup, "Post Service") {
+    Container(postService, "Post Service", "Go", "Manages posts and metadata", $tags="webApp")
+    ContainerDb(postDB, "Post database", "PgSQL", "Stores posts", $tags="db", $sprite="postgresql")
+    ContainerDb(postCache, "Post cache", "Redis", "Caches popular posts", $tags="db", $sprite="redis")
+    Container(cdc, "Post CDC", "Daemon", "Notifies about new posts and image URLs")
 }
 
-Rel(userService, userDb, "Read/write users/subscribes")
-Rel(userService, userCache, "Cache popular users")
+Rel(client, loadBalancer, "CRUD posts, search", "REST")
+Rel(loadBalancer, postService, "Forward requests", "REST")
 
-Rel(client, loadBalancer, "Request", "REST")
-Rel(loadBalancer, postService, "CRUD post, search", "REST")
-Rel(loadBalancer, userService, "CRUD users, subscribes", "REST")
-Rel(loadBalancer, reactions, "CRUD likes/comments", "REST")
-Rel(loadBalancer, media, "CRUD media", "REST")
+Rel(postService, postDB, "Read/write posts")
+Rel(postService, postCache, "Cache popular posts")
+Rel(postService, cdc, "Push changes")
 
-Rel(postService, geoService, "Get geo info")
-Rel(userService, geoService, "Get geo info")
-Rel(postService, messageQueue, "Publishes events for adding/removing a post")
-Rel(reactions, messageQueue, "Subscribes on events for adding/removing a post")
-Rel(postService, media, "Notify about changes")
+Rel(postService, geoSystem, "Fetch geo info")
+Rel(postService, mediaSystem, "Link image URLs")
+
+Rel(postService, postEventsQueue, "Publish post lifecycle events")
+Rel(cdc, mediaSystem, "Notify about image associations")
+
+' Новая связь: подписка на события отношений пользователей
+Rel(postService, userRelationsQueue, "Subscribe to user relation events")
 @enduml
