@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+
+Person(client, "Client", "Site/Mobile")
+Container_Ext(loadBalancer, "Load Balancer", "Nginx", "Routes incoming requests")
+System_Ext(postSystem, "Post System", "Requests geo for posts")
+System_Ext(userSystem, "User System", "Requests geo for users")
+
+System_Boundary(geoServiceGroup, "Geo Service") {
+    Container(geoService, "Geo Service", "Go", "Manages geo tags", $tags="webApp")
+    ContainerDb(geoDB, "Geo database", "PgSQL + PostGIS", "Stores geo points", $tags="db", $sprite="postgresql")
+    ContainerDb(geoCache, "Geo cache", "Redis", "Caches frequent geo queries", $tags="db", $sprite="redis")
+}
+
+Rel(client, loadBalancer, "Query geo data", "REST")
+Rel(loadBalancer, geoService, "Forward requests", "REST")
+
+Rel(geoService, geoDB, "Read/write geo tags")
+Rel(geoService, geoCache, "Cache popular geo tags")
+
+Rel(postSystem, geoService, "Get geo for posts")
+Rel(userSystem, geoService, "Get geo for users")
+@enduml

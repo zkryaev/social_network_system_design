@@ -41,6 +41,29 @@
        4. *Поиск постов: 2с*
        3. *Операция оценки/комментирования/подписки: 1с*
 
+## Верхнеуровневое представление системы
+1. Нотация: [C4-Model](https://c4model.com/)
+2. Инструмент визуализации [PlantText](https://www.planttext.com/) на основе [PlantUML Doc](https://github.com/plantuml-stdlib/C4-PlantUML)
+
+### **Level 1.** System context diagram
+![system context](https://github.com/zkryaev/social_network_system_design/blob/hw5/c4-modelling/architecture/diagrams/system_context.svg)
+
+### **Level 2.** Container diagram
+#### 1. Post system
+![post system](https://github.com/zkryaev/social_network_system_design/blob/hw5/c4-modelling/architecture/diagrams/containers/posts_container.svg)
+
+#### 2. User system
+![user system](https://github.com/zkryaev/social_network_system_design/blob/hw5/c4-modelling/architecture/diagrams/containers/users_container.svg)
+
+#### 3. Reactions system
+![reactions system](https://github.com/zkryaev/social_network_system_design/blob/hw5/c4-modelling/architecture/diagrams/containers/reactions_container.svg)
+
+#### 4. Media system
+![media system](https://github.com/zkryaev/social_network_system_design/blob/hw5/c4-modelling/architecture/diagrams/containers/media_container.svg)
+
+#### 5. Geo system
+![geo system](https://github.com/zkryaev/social_network_system_design/blob/hw5/c4-modelling/architecture/diagrams/containers/geo_container.svg)
+
 ## Оценка нагрузки
 
 ### Расчет RPS

@@ -1,0 +1,21 @@
+@startuml System_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(client, "Client", "Site/Mobile")
+Container(media, "S3 Storage", "Ceph/Minio", "Store images by image_url")
+Container(postService, "Post Service", "Go", "Store and handle posts")
+Container(userService, "User Service", "Go", "Store and handle users")
+Container(reactions, "Reactions Service", "Go", "Store and handle comments and likes")
+Container(geoService, "Geo Service", "Go", "Store and handle geo marks")
+
+Rel(client, media, "Load/Get images")
+Rel(client, postService, "Get posts")
+Rel(client, userService, "Get users")
+Rel(client, reactions, "Retrieve post's likes and comments")
+Rel(postService, geoService, "Get geo data")
+Rel(userService, geoService, "Get geo data")
+Rel(postService, reactions, "Send updates about posts")
+Rel(postService, media, "Send updates about post's images")
+Rel(postService, userService, "Get user's relations")
+
+@enduml

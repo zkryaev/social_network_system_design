@@ -1,0 +1,31 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+
+Person(client, "Client", "Site/Mobile")
+Container_Ext(loadBalancer, "Load Balancer", "Nginx", "Routes incoming requests")
+System_Ext(geoSystem, "Geo System", "Provides geo tags")
+System_Ext(mediaSystem, "Media System", "Stores images")
+ContainerQueue_Ext(messageQueue, "Events queue", "Kafka", "Publishes post events")
+
+System_Boundary(postServiceGroup, "Post Service") {
+    Container(postService, "Post Service", "Go", "Manages posts and metadata", $tags="webApp")
+    ContainerDb(postDB, "Post database", "PgSQL", "Stores posts", $tags="db", $sprite="postgresql")
+    ContainerDb(postCache, "Post cache", "Redis", "Caches popular posts", $tags="db", $sprite="redis")
+    Container(cdc, "CDC", "Daemon", "Notifies about new posts and image URLs")
+}
+
+Rel(client, loadBalancer, "CRUD posts, search", "REST")
+Rel(loadBalancer, postService, "Forward requests", "REST")
+
+Rel(postService, postDB, "Read/write posts")
+Rel(postService, postCache, "Cache popular posts")
+Rel(postService, cdc, "Push changes")
+
+Rel(postService, geoSystem, "Fetch geo info")
+Rel(postService, mediaSystem, "Link image URLs")
+Rel(postService, messageQueue, "Publish post lifecycle events")
+Rel(cdc, mediaSystem, "Notify about image associations")
+@enduml

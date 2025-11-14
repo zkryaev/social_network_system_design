@@ -1,0 +1,24 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+
+Person(client, "Client", "Site/Mobile")
+Container_Ext(loadBalancer, "Load Balancer", "Nginx", "Routes incoming requests")
+ContainerQueue_Ext(messageQueue, "Events queue", "Kafka", "Receives post update events")
+
+System_Boundary(reactionsServiceGroup, "Reactions Service") {
+    Container(reactions, "Reactions Service", "Go", "Handles likes and comments", $tags="webApp")
+    ContainerDb(reactionsDb, "Reactions database", "PgSQL", "Stores reactions", $tags="db", $sprite="postgresql")
+    ContainerDb(reactionsCache, "Reactions cache", "Redis", "Caches reactions for popular posts", $tags="db", $sprite="redis")
+}
+
+Rel(client, loadBalancer, "CRUD likes/comments", "REST")
+Rel(loadBalancer, reactions, "Forward requests", "REST")
+
+Rel(reactions, reactionsDb, "Read/write reactions")
+Rel(reactions, reactionsCache, "Cache popular reactions")
+
+Rel(reactions, messageQueue, "Subscribe to post events")
+@enduml
