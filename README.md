@@ -1,4 +1,4 @@
-# Cоциальная сеть для путешественников - [System Design Course](https://balun.courses/courses/system_design)
+# Cоциальная сеть для путешественников - [System Design Course](https://balun.courses/courses/system_design) [DONE ✔️]
 
 ## Функциональные требования
   1. Создание поста, с 1 фотографией, описанием и тэгом местоположения;
